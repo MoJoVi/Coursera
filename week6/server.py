@@ -10,7 +10,7 @@ import asyncio
 class Server(asyncio.Protocol):
     metrics_dict = dict()  # для этой задачи вполне достаточно использовать
     # словарь, позже можно будет осуществить долговременое хранение в
-    # файле, а лучше с помощью СУБД
+    # JSON, а лучше с помощью СУБД
 
     def connection_made(self, transport):
         self.transport = transport
@@ -32,7 +32,6 @@ class Server(asyncio.Protocol):
             'put': self.put
         }
         request = command.split()
-        print(request)
         return client_req.get(request[0], self.wrong_request)(*request[1:])
 
     @staticmethod
