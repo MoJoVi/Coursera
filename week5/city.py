@@ -3,7 +3,7 @@
 Написать программу для определения погоды в заданном городе.
 """
 import requests
-from secrets._city_secrets import host, key, my_city
+from _city_secrets import host, key, my_city
 
 
 class CityInfo:
