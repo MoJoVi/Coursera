@@ -1,6 +1,6 @@
 """
 Задача:
-написать сетевую программу - клиент, которая будет уметь отправлять данные
+Написать сетевую программу - клиент, которая будет уметь отправлять данные
 различных метрик на сервер, запрашивать информацию хранящихся на сервере
 и обрабатывать его ответы.
 """
@@ -42,8 +42,8 @@ class Client:
         :return: None
         """
         with open('client_log', 'a') as log_file:
-            log_file.write(str(error))
-            raise ClientError(description)
+            log_file.write(str(error) + '\n\n')
+        raise ClientError(description)
 
     def _server_ans(self):
         """
