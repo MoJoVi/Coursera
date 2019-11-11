@@ -50,16 +50,16 @@ class CityInfo:
                     'Температура': f'{int(response["main"]["temp"] - 273.15)} °C',
                     'На улице': response['weather'][0]['description'],
                     'Скорость ветра': f'{response["wind"]["speed"]} м/с'
-                }
+                }  # API Возвращает температуру в кедьвинах, поэтому её
+                # необходимо переводить в граддусы цельсия
             else:
-                self.city_forecast = 'Неверно введен город' if str(response['cod'])[0] == '4' else 'Ошибка сервера'
+                self.city_forecast = 'Неверно введен город'
 
     def __str__(self):
         """
         Если ошибок не было, то итерируется по словарю и переводит
         необходимые данные в строковой формат, в противном случае
         возвращает строку для пользователя с типом ошибки
-        :return:
         """
         if type(self.city_forecast) is dict:
             res_string = ''

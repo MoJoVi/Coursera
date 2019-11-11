@@ -3,12 +3,12 @@
 Написать сетевую программу - Сервер, которая будет хранить отправляемые
 клиентом метрики и по запросу отправлять данные клиенту
 """
-
 import asyncio
+from collections import defaultdict
 
 
 class Server(asyncio.Protocol):
-    metrics_dict = dict()  # для этой задачи вполне достаточно использовать
+    metrics_dict = defaultdict(list)  # для этой задачи вполне достаточно использовать
     # словарь, позже можно будет осуществить долговременое хранение в
     # JSON, а лучше с помощью СУБД
 
@@ -16,7 +16,6 @@ class Server(asyncio.Protocol):
         self.transport = transport
 
     def data_received(self, data):
-
         ans = self.sort_requests(data.decode().strip('\r\n'))
         self.transport.write(ans.encode())
 
@@ -34,8 +33,7 @@ class Server(asyncio.Protocol):
         request = command.split()
         return client_req.get(request[0], self.wrong_request)(*request[1:])
 
-    @staticmethod
-    def get(key):
+    def get(self, key):
         """
         Возвращает клиенту данные хранящиеся на сервере по ключу и формирует
         верный ответ сервера.
@@ -47,12 +45,11 @@ class Server(asyncio.Protocol):
             for key, value in Server.metrics_dict.items():
                 res += ''.join([f'{key} {t} {val}\n' for val, t in value])
         else:
-            for value in Server.metrics_dict.get(key, list()):
+            for value in Server.metrics_dict[key]:
                 res += f'{key} {value[1]} {value[0]}\n'
         return res + '\n'
 
-    @staticmethod
-    def put(key, value, timestamp):
+    def put(self, key, value, timestamp):
         """
         Метод записывает отправленные клиентом данные на сервер.
         :param key: ключ.
@@ -60,15 +57,11 @@ class Server(asyncio.Protocol):
         :param timestamp: время замера.
         :return: сформированный ответ сервера
         """
-        if Server.metrics_dict.get(key, False):
-            if not (timestamp, value) in Server.metrics_dict[key]:
-                Server.metrics_dict[key].append((timestamp, value))
-        else:
-            Server.metrics_dict[key] = [(timestamp, value)]
+        if not (timestamp, value) in Server.metrics_dict[key]:
+            Server.metrics_dict[key].append((timestamp, value))
         return 'ok\n\n'
 
-    @staticmethod
-    def wrong_request(*args):
+    def wrong_request(self, *args):
         """
         Метод вызывается при неверном запросе со стороны клиента
         :param args: запрос клиента
